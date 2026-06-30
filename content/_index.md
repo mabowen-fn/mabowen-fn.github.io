@@ -1,0 +1,24 @@
++++
+title = "Index"
++++
+
+{{< figure class="avatar" src="/logo.png" >}}
+
+### About
+
+Graduate student of Yunnan University, China
+
+### Categories
+
+- [Resume](portfolio)
+- [Projects](project)
+- [Learn](learn)
+- [Music on SoundCloud](https://soundcloud.com/joel-meles)
+
+### Links
+
+- [YouTube](https://www.youtube.com/channel/UCEF4jrMld3MmgUfc8g-kHCA)
+- [e-mail](mailto:tojoelmeles@gmail.com)
+- [GitHub](https://github.com/eyoelmeles)
+- [Twitter](https://twitter.com/joelmcmeles)
+- [Telegram](https://t.me/eoel007)

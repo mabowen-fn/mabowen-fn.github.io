@@ -1,0 +1,90 @@
+{{ $note := .Get "note" }}
+<mark class="site-highlight {{ if $note }}has-note{{ end }}" {{ if $note }}data-note="{{ $note }}"{{ end }}>
+  {{ .Inner }}
+</mark>
+
+<script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+    const notes = document.querySelectorAll('mark.has-note');
+    
+    notes.forEach(note => {
+        note.addEventListener('click', function(e) {
+            // Toggle a class to keep the tooltip visible on tap
+            this.classList.toggle('active-note');
+        });
+    });
+});
+</script>
+
+<style>
+    mark.site-highlight {
+    background-color: #fff2a8; /* A soft, readable yellow */
+    color: inherit;
+    padding: 0.1em 0.2em;
+    border-radius: 3px;
+    position: relative;
+}
+
+/* Style specifically for highlights that include a note */
+mark.has-note {
+    border-bottom: 2px dashed #d4a700; /* Visual indicator for notes */
+    cursor: help; /* Changes mouse to a question mark on hover */
+}
+
+/* The Pop-up Note Box */
+mark.has-note::after {
+    content: attr(data-note); /* Pulls the text from the shortcode */
+    position: absolute;
+    bottom: 130%; /* Positions it above the text */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #2b2b2b;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: sans-serif;
+    line-height: 1.4;
+    width: max-content;
+    max-width: 250px; /* Prevents long notes from breaking the screen */
+    white-space: normal;
+    z-index: 100;
+    
+    /* Animation & Visibility */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* The tiny triangle pointing down to the text */
+mark.has-note::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #2b2b2b transparent transparent transparent;
+    z-index: 100;
+    
+    /* Animation & Visibility */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Show the note when hovering over the text */
+mark.has-note:hover::after,
+mark.has-note:hover::before {
+    opacity: 1;
+    visibility: visible;
+    bottom: 120%; /* Slight upward movement on hover */
+}
+
+mark.has-note.active-note::after, mark.has-note.active-note::before {
+    opacity: 1;
+    visibility: visible; 
+}
+</style>
