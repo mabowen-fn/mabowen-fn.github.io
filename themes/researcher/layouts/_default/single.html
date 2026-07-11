@@ -1,3 +1,9 @@
 {{ define "main" }}
-<div class="container">{{ .Content }}</div>
+<div class="container">
+  <div class="bionic-reading-toolbar" aria-label="Reading preference">
+    <a href="#" class="bionic-reading-toggle" data-bionic-toggle aria-pressed="false">Bionic reading: off</a>
+  </div>
+  <div class="bionic-reading-content" data-bionic-page="{{ .File.Path | default .RelPermalink }}">{{ .Content }}</div>
+</div>
+{{ partial "bionic-reading.html" . }}
 {{ end }}

@@ -1,0 +1,161 @@
+{{/* Enable a lightweight Bionic Reading effect on single pages with a minimal inline toggle */}}
+{{ $style := `
+.bionic-reading-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+.bionic-reading-toggle {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: inherit;
+  text-decoration: none;
+  line-height: 1.4;
+}
+.bionic-reading-toggle:hover,
+.bionic-reading-toggle:focus,
+.bionic-reading-toggle[aria-pressed="true"] {
+  color: inherit;
+  text-decoration: none;
+}
+.bionic-reading-content {
+  line-height: 1.7;
+}
+.bionic-reading-content .bionic-word {
+  font-weight: 400;
+}
+.bionic-reading-content .bionic-word strong {
+  font-weight: 700;
+}
+` }}
+<style>{{ $style | safeCSS }}</style>
+<script>
+(function () {
+  const storagePrefix = 'bionicReading:';
+
+  function applyBionicReading(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentNode;
+        if (!parent) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        if (parent.closest('pre, code, script, style, noscript, svg, img, video, audio, iframe, canvas, textarea, input, select, strong, b, em, i, a, mark, h1, h2, h3, h4, h5, h6')) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        if (!node.textContent || !node.textContent.trim()) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const textNodes = [];
+    let currentNode;
+    while ((currentNode = walker.nextNode())) {
+      textNodes.push(currentNode);
+    }
+
+    textNodes.forEach(function (node) {
+      const text = node.textContent || '';
+      if (!text || !/[\p{L}\p{N}]/u.test(text)) {
+        return;
+      }
+
+      const fragments = text.split(/(\s+|[^\p{L}\p{N}]+)/u);
+      const fragment = document.createDocumentFragment();
+
+      fragments.forEach(function (part) {
+        if (!part) {
+          return;
+        }
+
+        if (/^\s+$/.test(part) || /^[^\p{L}\p{N}]+$/u.test(part)) {
+          fragment.appendChild(document.createTextNode(part));
+          return;
+        }
+
+        const word = part;
+        const splitIndex = Math.max(1, Math.ceil(word.length / 2));
+        const prefix = word.slice(0, splitIndex);
+        const suffix = word.slice(splitIndex);
+        const wrapper = document.createElement('span');
+        wrapper.className = 'bionic-word';
+        const highlight = document.createElement('strong');
+        highlight.textContent = prefix;
+        wrapper.appendChild(highlight);
+        if (suffix) {
+          wrapper.appendChild(document.createTextNode(suffix));
+        }
+        fragment.appendChild(wrapper);
+      });
+
+      if (node.parentNode) {
+        node.parentNode.replaceChild(fragment, node);
+      }
+    });
+  }
+
+  function setButtonState(button, enabled) {
+    if (!button) {
+      return;
+    }
+    button.classList.toggle('active', enabled);
+    button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    button.textContent = enabled ? 'Bionic reading: on' : 'Bionic reading: off';
+  }
+
+  function initBionicReading() {
+    document.querySelectorAll('.bionic-reading-content').forEach(function (element) {
+      const pageId = element.getAttribute('data-bionic-page') || 'default';
+      const storageKey = storagePrefix + pageId;
+      const toggle = element.parentElement ? element.parentElement.querySelector('[data-bionic-toggle]') : null;
+
+      if (!toggle) {
+        return;
+      }
+
+      if (!element.dataset.bionicOriginalHtml) {
+        element.dataset.bionicOriginalHtml = element.innerHTML;
+      }
+
+      function restoreContent() {
+        element.innerHTML = element.dataset.bionicOriginalHtml;
+      }
+
+      function enableContent() {
+        restoreContent();
+        applyBionicReading(element);
+      }
+
+      const savedState = window.localStorage.getItem(storageKey);
+      const isEnabled = savedState === 'true';
+      setButtonState(toggle, isEnabled);
+      if (isEnabled) {
+        enableContent();
+      } else {
+        restoreContent();
+      }
+
+      toggle.addEventListener('click', function (event) {
+        event.preventDefault();
+        const shouldEnable = toggle.getAttribute('aria-pressed') !== 'true';
+        if (shouldEnable) {
+          enableContent();
+          window.localStorage.setItem(storageKey, 'true');
+        } else {
+          restoreContent();
+          window.localStorage.setItem(storageKey, 'false');
+        }
+        setButtonState(toggle, shouldEnable);
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBionicReading);
+  } else {
+    initBionicReading();
+  }
+})();
+</script>
