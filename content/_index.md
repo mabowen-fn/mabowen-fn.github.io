@@ -19,6 +19,6 @@ Graduate student of Yunnan University, China
 
 - [YouTube](https://www.youtube.com/channel/UCEF4jrMld3MmgUfc8g-kHCA)
 - [e-mail](mailto:tojoelmeles@gmail.com)
-- [GitHub](https://github.com/eyoelmeles)
+- [GitHub](https://github.com/mabowen-fn)
 - [Twitter](https://twitter.com/joelmcmeles)
 - [Telegram](https://t.me/eoel007)
